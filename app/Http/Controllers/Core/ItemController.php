@@ -39,7 +39,7 @@ class ItemController extends Controller
 
     public function index()
     {
-        $items = Item::where('status','Failed')->orderBy('itemCd','desc')->limit(1000)->get();
+        $items = Item::where('status','Failed')->latest()->orderByDesc('id')->limit(1000)->get();
         return view('pages.core.items', [
             'items' => $items,
         ]);

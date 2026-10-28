@@ -20,13 +20,13 @@ use App\Jobs\UpdateSalesInvoiceStocks;
 class PurchaseController extends Controller
 {
     public function index(){
-        $purchases = Purchase::all();
+        $purchases = Purchase::latest()->orderByDesc('id')->get();
         return view('pages.core.purchases',[
             'purchases'=>$purchases
         ]);
     }
     public function crdr(){
-        $purchases = PurchaseCreditDebitNote::all();
+        $purchases = PurchaseCreditDebitNote::latest()->orderByDesc('id')->get();
         return view('pages.core.crdr-purchases',[
             'purchases'=>$purchases
         ]);

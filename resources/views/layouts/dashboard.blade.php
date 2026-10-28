@@ -100,6 +100,7 @@
                 $(this).DataTable({
                     pageLength: 10,
                     autoWidth: false,
+                    order: [],
                     language: { search: 'Search records', searchPlaceholder: 'Type to filter…' }
                 });
             }

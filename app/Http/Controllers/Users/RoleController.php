@@ -17,7 +17,7 @@ class RoleController extends Controller
 
     public function index()
     {
-        $roles = Role::all();
+        $roles = Role::latest()->orderByDesc('id')->get();
         return view('pages.users.roles', [
             'roles' => $roles,
         ]);
@@ -25,8 +25,8 @@ class RoleController extends Controller
 
     public function configure($role_id)
     {
-        $permissions = Permission::all();
-        $role_permissions = RolePermission::where("role_id", $role_id)->get();
+        $permissions = Permission::latest()->orderByDesc('id')->get();
+        $role_permissions = RolePermission::where("role_id", $role_id)->latest()->orderByDesc('id')->get();
         $role = Role::find($role_id);
         return view('pages.users.role-permissions', [
             'permissions' => $permissions,

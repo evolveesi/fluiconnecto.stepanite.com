@@ -41,6 +41,7 @@ class InvoiceController extends Controller
         // $data = SalesInvoice::orderBy('updated_at','desc')->limit(500)->get();
         $data = SalesInvoice::where('created_at', '>=', Carbon::now()->subMonths(3))
                             ->orderBy('created_at', 'desc')
+                            ->orderByDesc('id')
                             ->get();
         return view('pages.invoices.index',['data'=>$data]);
     }

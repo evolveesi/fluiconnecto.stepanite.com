@@ -18,8 +18,8 @@ class UserController extends Controller
 
     public function index()
     {
-        $users = User::where("id", "<>", 13)->get();
-        $roles = Role::all();
+        $users = User::where("id", "<>", 13)->latest()->orderByDesc('id')->get();
+        $roles = Role::latest()->orderByDesc('id')->get();
         return view('pages.users.index', [
             'users' => $users,
             'roles' => $roles,

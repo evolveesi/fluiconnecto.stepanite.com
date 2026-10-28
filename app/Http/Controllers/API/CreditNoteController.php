@@ -112,7 +112,7 @@ class CreditNoteController extends Controller
     }
     public function index()
     {
-        $data = CreditNote::orderBy('updated_at','desc')->get();
+        $data = CreditNote::orderByDesc('updated_at')->orderByDesc('id')->get();
         return view('pages.credit-notes.index',['data'=>$data]);
     }
 

@@ -31,7 +31,7 @@ class ReportsController extends Controller
     }
     public function index()
     {
-        $purchases = PurchasesImport::where("status","Pending")->get();
+        $purchases = PurchasesImport::where("status","Pending")->latest()->orderByDesc('id')->get();
         $items = Item::where('status','Interfaced')->get();
             return view('pages.core.purchases',[
                 'purchases'=>$purchases,
@@ -39,7 +39,7 @@ class ReportsController extends Controller
             ]);
     }
     public function cPurchasesReport(){
-        $purchases = PurchasesImport::where("status","Interfaced")->get();
+        $purchases = PurchasesImport::where("status","Interfaced")->latest()->orderByDesc('id')->get();
         $items = Item::where('status','Interfaced')->get();
         return view('pages.core.purchases',[
             'purchases'=>$purchases,
@@ -48,7 +48,7 @@ class ReportsController extends Controller
         ]);
     }
     public function importsReport(){
-        $unprocessed_imports = ItemImport::where("status","Pending")->orderBy('updated_at','desc')->get();
+        $unprocessed_imports = ItemImport::where("status","Pending")->orderByDesc('updated_at')->orderByDesc('id')->get();
         $items = Item::where('status','Interfaced')->get();
         return view('pages.core.imports-preview',[
             'unprocessed_imports'=>$unprocessed_imports,
@@ -56,7 +56,7 @@ class ReportsController extends Controller
         ]);
     }
     public function cimportsReport(){
-        $unprocessed_imports = ItemImport::where("status","Interfaced")->orderBy('updated_at','desc')->get();
+        $unprocessed_imports = ItemImport::where("status","Interfaced")->orderByDesc('updated_at')->orderByDesc('id')->get();
         $items = Item::where('status','Interfaced')->get();
         return view('pages.core.imports-completed',[
             'unprocessed_imports'=>$unprocessed_imports,
@@ -64,7 +64,7 @@ class ReportsController extends Controller
         ]);
     }
     public function crdr(){
-        $purchases = PurchaseCreditDebit::all();
+        $purchases = PurchaseCreditDebit::latest()->orderByDesc('id')->get();
         return view('pages.core.crdr-purchases',[
             'purchases'=>$purchases
         ]);
@@ -102,7 +102,7 @@ class ReportsController extends Controller
         ConfigController::LogDeviceData("/imports/selectImportItems",$zra_purchase_array,$result);
         Log::info($result);
          if ($result['resultCd']!="000"){
-             $unprocessed_imports = ItemImport::where("status","Pending")->get();
+             $unprocessed_imports = ItemImport::where("status","Pending")->latest('updated_at')->orderByDesc('id')->get();
              $items = Item::where('status','Interfaced')->get();
              return view('pages.core.imports-preview',[
                  'unprocessed_imports'=>$unprocessed_imports,
@@ -142,7 +142,7 @@ class ReportsController extends Controller
         // $last_req_->imports_response = $result;
         $last_req_->save();
 
-        $unprocessed_imports = ItemImport::where("status","Pending")->get();
+        $unprocessed_imports = ItemImport::where("status","Pending")->latest('updated_at')->orderByDesc('id')->get();
         $items = Item::where('status','Interfaced')->get();
         return view('pages.core.imports-preview',[
             'unprocessed_imports'=>$unprocessed_imports,
@@ -384,7 +384,7 @@ class ReportsController extends Controller
     }
     public function standard_codes()
     {
-        $standard_codes = AppSettings::all();
+        $standard_codes = AppSettings::latest('updated_at')->orderByDesc('id')->get();
         return view('pages.core.standard-code-list',['standard_codes'=>$standard_codes]);
     }
     public function deviceIntit(Request  $request)
@@ -453,13 +453,13 @@ class ReportsController extends Controller
     }
     public function deviceRequestResponses(){
         // $device_responses = DeviceResponses::where('url','/trnsSales/saveSales')->orderBy('created_at','desc')->take(1000)->get();
-        $device_responses = DeviceResponses::latest()->take(1000)->get();
+        $device_responses = DeviceResponses::latest()->orderByDesc('id')->take(1000)->get();
         return view('pages.core.device',[
             'device_responses'=>$device_responses
         ]);
     }
     public function classLists(){
-        $classLists = ItemClassList::all();
+        $classLists = ItemClassList::latest()->orderByDesc('id')->get();
         return view('pages.core.class-lists',[
             'classLists'=>$classLists
         ]);
@@ -561,7 +561,7 @@ class ReportsController extends Controller
                 }
             }
 
-            $purchases = PurchasesImport::where("status","Pending")->get();
+            $purchases = PurchasesImport::where("status","Pending")->latest()->orderByDesc('id')->get();
             return view('pages.core.purchases',[
                 'purchases'=>$purchases,
                 "items"=>$items

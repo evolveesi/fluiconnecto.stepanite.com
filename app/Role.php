@@ -23,13 +23,13 @@ class Role extends Model
 
     public function role_permissions()
     {
-        return $this->hasMany(RolePermission::class, 'role_id', 'id');
+        return $this->hasMany(RolePermission::class, 'role_id', 'id')->latest()->orderByDesc('id');
     }
 
     public function missing_permissions()
     {
 
-        $permissions = DB::select("select * from permissions where id not in (select permission_id as id from role_permissions where role_id=?)", [$this->id]);
+        $permissions = DB::select("select * from permissions where id not in (select permission_id as id from role_permissions where role_id=?) order by id desc", [$this->id]);
         return $permissions;
     }
 }

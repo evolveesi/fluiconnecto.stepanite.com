@@ -15,7 +15,7 @@ class PermissionController extends Controller
 
     public function index()
     {
-        $permissions = Permission::all();
+        $permissions = Permission::latest()->orderByDesc('id')->get();
         return view('pages.users.permissions', [
             'permissions' => $permissions,
         ]);
