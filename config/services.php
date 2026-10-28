@@ -30,4 +30,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'sage' => [
+        'url' => env('SAGE_URL'),
+        'user' => env('SAGE_USER'),
+        'password' => env('SAGE_PASSWORD'),
+        'timeout' => (int) env('SAGE_REQUEST_TIMEOUT', 300),
+    ],
+
 ];

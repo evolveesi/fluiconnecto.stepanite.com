@@ -14,6 +14,7 @@ use Exception;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Client\ConnectionException;
 use TCPDF;
 use App\Jobs\UpdateSalesInvoiceStocks;
 use Carbon\Carbon;
@@ -83,61 +84,78 @@ class InvoiceController extends Controller
 
     public function checkSageUninterfacedInvoices()
     {
-        // GET /sage300webapi/v1.0/OEINV/Invoices?$filter=DocDate eq {today}
-        $sage_base_url = env('SAGE_URL');
-        $sageUser = env('SAGE_USER');
-        $sagePwd = env('SAGE_PASSWORD');
+        $sage_base_url = rtrim((string) config('services.sage.url'), '/');
+        $sageUser = config('services.sage.user');
+        $sagePwd = config('services.sage.password');
+        $timeout = max(1, (int) config('services.sage.timeout', 300));
 
-        $filter = '$top=100&$orderby=PostingDate desc&$select=InvoiceUniquifier';
-
-        $response = Http::withBasicAuth($sageUser, $sagePwd)->get("$sage_base_url/OE/OEInvoices?$filter");
-
-        $result = $response->json();
-        $result = $result['value'];
-        
-        foreach($result as $count => $row)
-        {
-            ++$count;
-            $InvoiceID = $row['InvoiceUniquifier'];
-            $sales_invoice  = SalesInvoice::where('invoice_id',$InvoiceID)->get();
-
-            if (count($sales_invoice))
-            {
-                Log::info($count.' - '.'Invoice already interfaced '.$InvoiceID);
-            }
-            else
-            {
-                Log::info($count.' - '.'Invoice not interfaced '.$InvoiceID);
-
-                //get the invoice to get the customer bpn
-                $response = Http::withBasicAuth($sageUser, $sagePwd)->get("$sage_base_url/OE/OEInvoices($InvoiceID)");
-                $uniterfaced_result = $response->json();
-                $CustomerNumber = $uniterfaced_result['CustomerNumber'];
-                Log::info('CustomerNumber - '.$CustomerNumber);
-
-                //get the tpin
-                $customerTPIN = '';
-                $response = Http::withBasicAuth($sageUser, $sagePwd)->get("$sage_base_url/AR/ARCustomers('$CustomerNumber')");
-                $customer_result = $response->json();
-                // Log::info($customer_result);
-                $customerTPIN = $customer_result['BusinessRegistrationNumber'];
-                Log::info('Customer TPIN - '.$customerTPIN);
-
-                try
-                {
-                    $response = Http::get(env('APP_URL') . "/api/send-invoice", [
-                        'InvoiceID' => $InvoiceID,
-                        'customerTPIN' => $customerTPIN
-                    ]);
-                }
-                catch(Exception $e)
-                {
-                    Log::error($e);
-                }
-            }
+        if ($sage_base_url === '' || !$sageUser || !$sagePwd) {
+            return response()->json(['success' => false, 'message' => 'Sage API is not configured.'], 503);
         }
 
-        return 1;
+        $sage = Http::withBasicAuth($sageUser, $sagePwd)->timeout($timeout);
+
+        $filter = '$top=100&$orderby=PostingDate desc&$select=InvoiceUniquifier';
+        $processed = 0;
+        $stage = 'Sage';
+
+        try {
+            $response = $sage->get("$sage_base_url/OE/OEInvoices?$filter");
+            if (!$response->successful() || !is_array($response->json('value'))) {
+                Log::warning('Sage invoice list request failed', ['status' => $response->status()]);
+                return response()->json(['success' => false, 'message' => 'Could not fetch the invoice list from Sage.'], 502);
+            }
+
+            foreach ($response->json('value') as $count => $row) {
+                $InvoiceID = $row['InvoiceUniquifier'] ?? null;
+                if (!$InvoiceID) {
+                    continue;
+                }
+
+                if (SalesInvoice::where('invoice_id', $InvoiceID)->exists()) {
+                    Log::info(($count + 1).' - Invoice already interfaced '.$InvoiceID);
+                    continue;
+                }
+
+                Log::info(($count + 1).' - Invoice not interfaced '.$InvoiceID);
+                $invoiceResponse = $sage->get("$sage_base_url/OE/OEInvoices($InvoiceID)");
+                $CustomerNumber = $invoiceResponse->json('CustomerNumber');
+                if (!$invoiceResponse->successful() || !$CustomerNumber) {
+                    Log::warning('Sage invoice detail request failed', ['invoice_id' => $InvoiceID, 'status' => $invoiceResponse->status()]);
+                    return response()->json(['success' => false, 'message' => 'Could not fetch invoice details from Sage.', 'processed' => $processed], 502);
+                }
+
+                $customerResponse = $sage->get("$sage_base_url/AR/ARCustomers('$CustomerNumber')");
+                $customerTPIN = $customerResponse->json('BusinessRegistrationNumber');
+                if (!$customerResponse->successful() || !$customerTPIN) {
+                    Log::warning('Sage customer request failed', ['invoice_id' => $InvoiceID, 'status' => $customerResponse->status()]);
+                    return response()->json(['success' => false, 'message' => 'Could not fetch customer details from Sage.', 'processed' => $processed], 502);
+                }
+
+                $stage = 'invoice service';
+                $sendResponse = Http::timeout($timeout)->get(config('app.url') . '/api/send-invoice', [
+                    'InvoiceID' => $InvoiceID,
+                    'customerTPIN' => $customerTPIN,
+                ]);
+                if (!$sendResponse->successful()) {
+                    Log::warning('Invoice interfacing request failed', ['invoice_id' => $InvoiceID, 'status' => $sendResponse->status()]);
+                    return response()->json(['success' => false, 'message' => 'Could not interface an invoice.', 'processed' => $processed], 502);
+                }
+                $processed++;
+                $stage = 'Sage';
+            }
+
+            return response()->json(['success' => true, 'message' => 'Sage invoice check completed.', 'processed' => $processed]);
+        } catch (ConnectionException $e) {
+            Log::warning('Invoice fetch timed out or could not connect', ['stage' => $stage, 'error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => $stage === 'Sage'
+                    ? 'Sage did not respond in time. Please try again later.'
+                    : 'The invoice service did not respond in time. Please try again later.',
+                'processed' => $processed,
+            ], 503);
+        }
     }
     public function checkSageUninterfacedInvoiceUniquifier($invoiceUniquifier)
     {
