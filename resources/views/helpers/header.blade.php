@@ -21,7 +21,7 @@
                     {{-- <img src="{{asset('assets/images/avatars/avatar-2.png')}}" class="user-img" alt="user avatar"> --}}
                     <div class="user-info">
                         <p class="user-name mb-0">{{\Illuminate\Support\Facades\Auth::user()->name}}</p>
-                        <p class="designattion mb-0">{{\Illuminate\Support\Facades\Auth::user()->role->name}}</p>
+                        <p class="designattion mb-0">{{ \Illuminate\Support\Facades\Auth::user()->role?->name ?? 'Account' }}</p>
                     </div>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
@@ -29,13 +29,12 @@
 {{--                    </li>--}}
                     <li><a class="dropdown-item d-flex align-items-center" href="{{route('get-settings')}}"><i class="bx bx-cog fs-5"></i><span>Settings</span></a>
                     </li>
-                    <li><a class="dropdown-item d-flex align-items-center" href="javascript:;" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <li><a class="dropdown-item d-flex align-items-center" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                             <i class="bx bx-log-out-circle"></i><span>{{ __('Logout') }}</span>
                         </a>
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                             @csrf
                         </form>
-                        </a>
                     </li>
                 </ul>
             </div>

@@ -1,103 +1,49 @@
 @extends('layouts.dashboard',[
     'page_name'=>'Home',
     'section_name'=>'Dashboard',
-    'activity_name'=>'Live Statistics'
+    'activity_name'=>'Overview'
 ])
 
 @section('content')
-    <div class="row mt-2 mb-2">
-        <div class="card">
-            <div class="card-body">
-                <table class="table table-bordered">
-                    <tr>
-                        <th><h5>TPIN</h3></th><td><h5>{{$settings->tinNumber}}</h3></td>
-                        <th><h5>Branch</h3></th><td><h5>{{$settings->branchCode}}</h3></td>
-                        <th><h5>Serial</h3></th><td><h5>{{$settings->dvcSrlNo}}</h3></td>
-                        <th><h5>Base URL</h3></th><td><h5>{{$settings->baseUrl}}</h3></td>
-                    </tr>
-                </table>
-            </div>
+    <section class="dashboard-hero" aria-labelledby="dashboard-title">
+        <div>
+            <span class="dashboard-eyebrow">Operations overview</span>
+            <h1 id="dashboard-title">Good to see you, {{ Auth::user()->name }}</h1>
+            <p>Manage device setup, reference codes, and transaction imports from one place.</p>
         </div>
+        <span class="dashboard-hero-mark" aria-hidden="true"><i class="bx bx-grid-alt"></i></span>
+    </section>
+
+    <section class="dashboard-details" aria-label="Connected device details">
+        <div class="dashboard-detail"><span>TPIN</span><strong>{{ $settings?->tinNumber ?: 'Not configured' }}</strong></div>
+        <div class="dashboard-detail"><span>Branch</span><strong>{{ $settings?->branchCode ?: 'Not configured' }}</strong></div>
+        <div class="dashboard-detail"><span>Device serial</span><strong>{{ $settings?->dvcSrlNo ?: 'Not configured' }}</strong></div>
+        <div class="dashboard-detail"><span>Base URL</span><strong title="{{ $settings?->baseUrl }}">{{ $settings?->baseUrl ?: 'Not configured' }}</strong></div>
+    </section>
+
+    <div class="dashboard-section-heading">
+        <div><span class="dashboard-eyebrow">Quick actions</span><h2>Get work done</h2></div>
+        <p>Select an action to continue</p>
     </div>
-    <div class="row">
-        <div class="col-md-4">
-            <a data-bs-toggle="modal" data-bs-target=".init-device">
-                <div class="card bg-dark">
-                    <div class="card-body">
-                        <p class="text-center">
-                            <i class='bx bx-fingerprint text-white font-60 '></i>
-                        <h2 class="text text-white text-center">Initialise Device</h2>
-                        </p>
-
-                    </div>
-                </div>
-            </a>
-        </div>
-        <div class="col-md-4">
-            <a data-bs-toggle="modal" data-bs-target=".standard-codes">
-                <div class="card bg-secondary">
-                    <div class="card-body">
-                        <p class="text-center">
-                            <i class='bx bx-coin text-white font-60 '></i>
-                        <h2 class="text text-white text-center">Standard Codes</h2>
-                        </p>
-
-                    </div>
-                </div>
-            </a>
-        </div>
-        <div class="col-md-4">
-            <a data-bs-toggle="modal" data-bs-target=".classification-codes">
-                <div class="card bg-warning">
-                    <div class="card-body">
-                        <p class="text-center">
-                            <i class='bx bx-cube text-white font-60 '></i>
-                        <h2 class="text text-white text-center">Classification Codes</h2>
-                        </p>
-
-                    </div>
-                </div>
-            </a>
-        </div>
-        <div class="col-md-4">
-            <a data-bs-toggle="modal" data-bs-target=".fetch-purchases">
-                <div class="card bg-dark">
-                    <div class="card-body">
-                        <p class="text-center">
-                            <i class='bx bx-sync text-white font-60 '></i>
-                        <h2 class="text text-white text-center">Fetch Purchase</h2>
-                        </p>
-
-                    </div>
-                </div>
-            </a>
-        </div>
-        <div class="col-md-4">
-            <a data-bs-toggle="modal" data-bs-target=".fetch-imports">
-                <div class="card bg-secondary">
-                    <div class="card-body">
-                        <p class="text-center">
-                            <i class='bx bx-import text-white font-60 '></i>
-                        <h2 class="text text-white text-center">Fetch Imports</h2>
-                        </p>
-
-                    </div>
-                </div>
-            </a>
-        </div>
-        <div class="col-md-4">
-            <a data-bs-toggle="modal" data-bs-target=".offline-transactions">
-                <div class="card bg-warning">
-                    <div class="card-body">
-                        <p class="text-center">
-                            <i class='bx bx-building text-white font-60 '></i>
-                        <h2 class="text text-white text-center">Offline Transactions</h2>
-                        </p>
-
-                    </div>
-                </div>
-            </a>
-        </div>
+    <div class="dashboard-actions">
+        <button type="button" class="dashboard-action" data-bs-toggle="modal" data-bs-target=".init-device">
+            <span class="dashboard-action-icon"><i class="bx bx-fingerprint"></i></span><span><strong>Initialise device</strong><small>Connect and configure a device</small></span><i class="bx bx-right-arrow-alt dashboard-action-arrow" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="dashboard-action" data-bs-toggle="modal" data-bs-target=".standard-codes">
+            <span class="dashboard-action-icon"><i class="bx bx-coin"></i></span><span><strong>Standard codes</strong><small>Fetch the latest reference codes</small></span><i class="bx bx-right-arrow-alt dashboard-action-arrow" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="dashboard-action" data-bs-toggle="modal" data-bs-target=".classification-codes">
+            <span class="dashboard-action-icon"><i class="bx bx-cube"></i></span><span><strong>Classification codes</strong><small>Update item classifications</small></span><i class="bx bx-right-arrow-alt dashboard-action-arrow" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="dashboard-action" data-bs-toggle="modal" data-bs-target=".fetch-purchases">
+            <span class="dashboard-action-icon"><i class="bx bx-sync"></i></span><span><strong>Fetch purchases</strong><small>Bring in purchase records</small></span><i class="bx bx-right-arrow-alt dashboard-action-arrow" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="dashboard-action" data-bs-toggle="modal" data-bs-target=".fetch-imports">
+            <span class="dashboard-action-icon"><i class="bx bx-import"></i></span><span><strong>Fetch imports</strong><small>Retrieve pending import records</small></span><i class="bx bx-right-arrow-alt dashboard-action-arrow" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="dashboard-action" data-bs-toggle="modal" data-bs-target=".offline-transactions">
+            <span class="dashboard-action-icon"><i class="bx bx-building"></i></span><span><strong>Offline transactions</strong><small>Process transactions waiting to sync</small></span><i class="bx bx-right-arrow-alt dashboard-action-arrow" aria-hidden="true"></i>
+        </button>
     </div>
 
     <div class="modal fade init-device" tabindex="-1" tabindex="-1" role="dialog"

@@ -1,3 +1,12 @@
+## Runtime requirements
+
+This application targets PHP 8.4 and Laravel 12. Install dependencies with
+`composer install` using PHP 8.4, then configure `.env` from `.env.example`
+and set `APP_KEY` before serving the application. The Composer platform is
+fixed at PHP 8.4.0 so dependency updates remain compatible with PHP 8.4.
+
+Run `php artisan about` and `php vendor/bin/phpunit` to check a local setup.
+
 <p align="center"><img src="https://res.cloudinary.com/dtfbvvkyp/image/upload/v1566331377/laravel-logolockup-cmyk-red.svg" width="400"></p>
 
 <p align="center">

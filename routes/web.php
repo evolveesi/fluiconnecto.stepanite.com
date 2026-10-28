@@ -72,7 +72,7 @@ Route::get('invoice-print/{id}', [InvoiceController::class, "printInvoice"])->na
 Route::get('invoice-reprint/{id}', [InvoiceController::class, "reprintInvoice"])->name('invoice-reprint');
 Route::post('reinterface-invoice', [InvoiceController::class, "reinterfaceInvoice"])->name('reinterface-invoice');
 Route::get('check-sage-uninterfaced-invoices', [InvoiceController::class, "checkSageUninterfacedInvoices"])->name('check-sage-uninterfaced-invoices');
-Route::get('check-sage-uninterfaced-invoices/{invoice_number}', [InvoiceController::class, "checkSageUninterfacedInvoice"])->name('check-sage-uninterfaced-invoices');
+Route::get('check-sage-uninterfaced-invoices/{invoice_number}', [InvoiceController::class, "checkSageUninterfacedInvoice"])->name('check-sage-uninterfaced-invoice-number');
 Route::get('check-sage-uninterfaced-invoice/{invoiceUniquifier}', [InvoiceController::class, "checkSageUninterfacedInvoiceUniquifier"])->name('check-sage-uninterfaced-invoice-uniquifier');
 Route::get('invoice-print-multi-sdc/{id}', [InvoiceController::class, "printInvoiceMultiSDC"])->name('invoice-print-multi-sdc');
 
@@ -85,8 +85,8 @@ Route::post('reinterface-credit-note', [CreditNoteController::class, "reinterfac
 Route::get('check-sage-uninterfaced-credit-notes', [CreditNoteController::class, "checkSageUninterfacedCreditNotes"])->name('check-sage-uninterfaced-credit-notes');
 
 //CRN & DN
-Route::get('xyz', [CreditNoteController::class, "index"])->name('credit-notes-interfacing-report');
-Route::get('xyz/{id}', [CreditNoteController::class, "printCRDN"])->name('invoice-crdn');
+Route::get('xyz', [CreditNoteController::class, "index"]);
+Route::get('xyz/{id}', [CreditNoteController::class, "printCRDN"]);
 
 #device initialization
 Route::post('initialise-device', [\App\Http\Controllers\Core\ReportsController::class, "deviceIntit"])->name('initialise-device');

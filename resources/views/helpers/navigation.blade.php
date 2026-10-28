@@ -4,16 +4,9 @@
         <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
             <div class="offcanvas-header border-bottom">
                 <div class="d-flex align-items-center">
-                    <a href="{{url('home')}}">
-                        <div class="">
-                            <a href="{{url('home')}}">
-                                <img src="{{asset('assets/images/logo-icon.png')}}" class="logo-icon" alt="logo icon">
-
-                            </a>
-                        </div>
-                        <div class="">
-                            <h4 class="logo-text">StepaNite</h4>
-                        </div>
+                    <a href="{{url('home')}}" class="d-flex align-items-center gap-2">
+                        <img src="{{asset('assets/images/logo-icon.png')}}" class="logo-icon" alt="Stepanite">
+                        <h4 class="logo-text mb-0">Stepanite</h4>
                     </a>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>

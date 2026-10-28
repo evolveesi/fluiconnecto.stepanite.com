@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="{{asset('assets/css/dark-theme.css')}}" />
     <link rel="stylesheet" href="{{asset('assets/css/semi-dark.css')}}" />
     <link rel="stylesheet" href="{{asset('assets/css/header-colors.css')}}" />
+    <link rel="stylesheet" href="{{asset('assets/css/dashboard-refresh.css')}}" />
     <title>Stepanite | {{$page_name}}</title>
 </head>
 
@@ -93,20 +94,17 @@
 <script src="{{asset('assets/plugins/datatable/js/dataTables.bootstrap5.min.js')}}"></script>
 
 <script>
-    $(document).ready(function() {
-        $('#example').DataTable();
-    } );
-</script>
-<script>
-    $(document).ready(function() {
-        var table = $('.datatable').DataTable( {
-            lengthChange: false,
-            buttons: [ 'copy', 'excel', 'pdf', 'print']
-        } );
-
-        table.buttons().container()
-            .appendTo( '.table-responsive ' );
-    } );
+    $(function () {
+        $('table.datatable, table#example').each(function () {
+            if (!$.fn.DataTable.isDataTable(this)) {
+                $(this).DataTable({
+                    pageLength: 10,
+                    autoWidth: false,
+                    language: { search: 'Search records', searchPlaceholder: 'Type to filter…' }
+                });
+            }
+        });
+    });
 </script>
 <!--app JS-->
 <script src="{{asset('assets/js/app.js')}}"></script>

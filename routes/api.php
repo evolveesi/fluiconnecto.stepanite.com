@@ -49,7 +49,7 @@ Route::get('/select-item/{itemID}', [ItemController::class, 'selectItem'])->name
 #invoice controller section
 Route::get('/send-invoice', [InvoiceController::class, 'sendInvoice'])->name('send-invoice')->middleware(["check.api.response"]);
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/home', [\App\Http\Controllers\HomeController::class, 'index'])->name('api-home');
 
 #credit note controller
 Route::get('/send-credit-note', [CreditNoteController::class, 'sendCreditNote'])->name('send-credit-note')->middleware(["check.api.response"]);
